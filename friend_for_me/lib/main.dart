@@ -33,19 +33,19 @@ class _MyHomePageState extends State<MyHomePage>
 
   int _counter = 0;
 
-  AnimationController _controller, _scoreSizeAnimationController;
+  AnimationController _controller, _imageSizeAnimationController;
 
   @override
   initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    _scoreSizeAnimationController = new AnimationController(vsync: this, duration: new Duration(milliseconds: 150));
-    _scoreSizeAnimationController.addStatusListener((status) {
+    _imageSizeAnimationController = new AnimationController(vsync: this, duration: new Duration(milliseconds: 150));
+    _imageSizeAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _scoreSizeAnimationController.reverse();
+        _imageSizeAnimationController.reverse();
       }
     });
-    _scoreSizeAnimationController.addListener((){
+    _imageSizeAnimationController.addListener((){
       setState(() {});
     });
   }
@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage>
 
   void _onChoice(int choice) {
     _animationIndex = choice;
-    _scoreSizeAnimationController.forward(from: 0.0);
+    _imageSizeAnimationController.forward(from: 0.0);
   }
 
   Widget _buildIcons() {
@@ -96,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage>
     } else if (index == SECOND_CHOICE) {
       assetName = 'sun.webp';
     }
-    final double extraSize = index == _animationIndex ? _scoreSizeAnimationController.value * 50 : 0.0;
+    final double extraSize = index == _animationIndex ? _imageSizeAnimationController.value * 50 : 0.0;
     double height = 100.0 + extraSize;
     double width = 100.0 + extraSize;
     final String imagePath = '$IMAGE_ASSET_PATH/$assetName';
