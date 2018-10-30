@@ -26,13 +26,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
-  int _counter = 0;
-  AnimationController _controller;
+    with TickerProviderStateMixin {
+  static const int FIRST_CHOICE = 0;
+  static const int SECOND_CHOICE = 1;
+  int _animationIndex;
 
-  _MyHomePageState() : super() {
+  int _counter = 0;
+
+  AnimationController _controller, _scoreSizeAnimationController;
+
+  @override
+  initState() {
+    super.initState();
     _controller = AnimationController(vsync: this);
+    _scoreSizeAnimationController = new AnimationController(vsync: this, duration: new Duration(milliseconds: 150));
+    _scoreSizeAnimationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _scoreSizeAnimationController.reverse();
+      }
+    });
+    _scoreSizeAnimationController.addListener((){
+      setState(() {});
+    });
   }
+
 
   @override
   void dispose() {
@@ -46,25 +63,45 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
+  void _onChoice(int choice) {
+    _animationIndex = choice;
+    _scoreSizeAnimationController.forward(from: 0.0);
+  }
+
   Widget _buildIcons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(12.0),
-          child: _buildImage('clouds.webp'),
+          child: GestureDetector(
+            onTap: () => _onChoice(FIRST_CHOICE),
+            child: _buildImage(FIRST_CHOICE),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(12.0),
-          child: _buildImage('sun.webp'),
+          child: GestureDetector(
+            onTap: () => _onChoice(SECOND_CHOICE),
+            child: _buildImage(SECOND_CHOICE),
+          ),
         )
       ],
     );
   }
 
-  Widget _buildImage(String assetName) {
-    final String path = '$IMAGE_ASSET_PATH/$assetName';
-    return Image.asset(path, height: 100.0, width: 100.0);
+  Widget _buildImage(int index) {
+    String assetName;
+    if (index == FIRST_CHOICE) {
+      assetName = 'clouds.webp';
+    } else if (index == SECOND_CHOICE) {
+      assetName = 'sun.webp';
+    }
+    final double extraSize = index == _animationIndex ? _scoreSizeAnimationController.value * 50 : 0.0;
+    double height = 100.0 + extraSize;
+    double width = 100.0 + extraSize;
+    final String imagePath = '$IMAGE_ASSET_PATH/$assetName';
+    return Image.asset(imagePath, height: height, width: width);
   }
 
   @override
