@@ -25,8 +25,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>
-    with TickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static const int FIRST_CHOICE = 0;
   static const int SECOND_CHOICE = 1;
   int _animationIndex;
@@ -39,13 +38,14 @@ class _MyHomePageState extends State<MyHomePage>
   initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    _imageSizeAnimationController = new AnimationController(vsync: this, duration: new Duration(milliseconds: 150));
+    _imageSizeAnimationController = new AnimationController(
+        vsync: this, duration: new Duration(milliseconds: 150));
     _imageSizeAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _imageSizeAnimationController.reverse();
       }
     });
-    _imageSizeAnimationController.addListener((){
+    _imageSizeAnimationController.addListener(() {
       setState(() {});
     });
   }
@@ -75,14 +75,14 @@ class _MyHomePageState extends State<MyHomePage>
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
             onTap: () => _onChoice(FIRST_CHOICE),
-            child: _buildImage(FIRST_CHOICE),
+            child: _buildContainer(FIRST_CHOICE),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
             onTap: () => _onChoice(SECOND_CHOICE),
-            child: _buildImage(SECOND_CHOICE),
+            child: _buildContainer(SECOND_CHOICE),
           ),
         )
       ],
@@ -96,11 +96,25 @@ class _MyHomePageState extends State<MyHomePage>
     } else if (index == SECOND_CHOICE) {
       assetName = 'sun.webp';
     }
-    final double extraSize = index == _animationIndex ? _imageSizeAnimationController.value * 50 : 0.0;
-    double height = 100.0 + extraSize;
-    double width = 100.0 + extraSize;
     final String imagePath = '$IMAGE_ASSET_PATH/$assetName';
-    return Image.asset(imagePath, height: height, width: width);
+    return Image.asset(imagePath);
+  }
+
+  Widget _buildContainer(int index) {
+    final double size = 100.0;
+    final double animationValue = _imageSizeAnimationController.value / 2;
+    final double factor = index == _animationIndex ? 1 + animationValue : 1 - animationValue;
+    return new Container(
+        alignment: new FractionalOffset(0.5, 0.5),
+        width: size,
+        height: size,
+        child: Transform(
+          alignment: FractionalOffset.center,
+          transform: Matrix4.identity()
+            ..scale(1.0 * factor,
+                1.0 * factor),
+          child: _buildImage(index),
+        ));
   }
 
   @override
