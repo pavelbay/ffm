@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 const IMAGE_ASSET_PATH = 'graphics';
@@ -28,8 +30,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static const int FIRST_CHOICE = 0;
   static const int SECOND_CHOICE = 1;
-  int _animationIndex;
+  static const TIMEOUT = const Duration(seconds: 1);
 
+  Timer holdTimer;
+
+  int _animationIndex;
   int _counter = 0;
 
   AnimationController _controller, _imageSizeAnimationController;
@@ -42,7 +47,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         vsync: this, duration: new Duration(milliseconds: 150));
     _imageSizeAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _imageSizeAnimationController.reverse();
+        holdTimer = Timer(TIMEOUT, () {
+          _imageSizeAnimationController.reverse();
+        });
       }
     });
     _imageSizeAnimationController.addListener(() {
@@ -63,8 +70,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   void _onChoice(int choice) {
-    _animationIndex = choice;
-    _imageSizeAnimationController.forward(from: 0.0);
+    if (!holdTimer.isActive) {
+      _animationIndex = choice;
+      _imageSizeAnimationController.forward(from: 0.0);
+    }
   }
 
   Widget _buildIcons() {
@@ -102,17 +111,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   Widget _buildContainer(int index) {
     final double size = 100.0;
-    final double animationValue = _imageSizeAnimationController.value / 2;
-    final double factor = index == _animationIndex ? 1 + animationValue : 1 - animationValue;
+    final double animationValue = _imageSizeAnimationController.value / 3.0;
+    final double factor =
+        index == _animationIndex ? 1 + animationValue : 1 - animationValue;
     return new Container(
         alignment: new FractionalOffset(0.5, 0.5),
         width: size,
         height: size,
         child: Transform(
           alignment: FractionalOffset.center,
-          transform: Matrix4.identity()
-            ..scale(1.0 * factor,
-                1.0 * factor),
+          transform: Matrix4.identity()..scale(1.0 * factor, 1.0 * factor),
           child: _buildImage(index),
         ));
   }
