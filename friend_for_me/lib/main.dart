@@ -76,10 +76,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     }
   }
 
-  void _timerListener() {
-
-  }
-
   Widget _buildIcons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
