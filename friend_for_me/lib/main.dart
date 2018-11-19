@@ -70,10 +70,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   void _onChoice(int choice) {
-    if (!holdTimer.isActive) {
+    if (holdTimer == null || !holdTimer.isActive) {
       _animationIndex = choice;
       _imageSizeAnimationController.forward(from: 0.0);
     }
+  }
+
+  void _timerListener() {
+
   }
 
   Widget _buildIcons() {
