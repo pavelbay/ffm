@@ -31,26 +31,34 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static const int FIRST_CHOICE = 0;
   static const int SECOND_CHOICE = 1;
   static const TIMEOUT = const Duration(seconds: 1);
-
+  static const ANIMATION_DURATION = const Duration(milliseconds: 150);
   Timer holdTimer;
 
   int _animationIndex;
   int _counter = 0;
 
-  AnimationController _controller, _imageSizeAnimationController;
+  AnimationController _controller,
+      _imageSizeAnimationController,
+      _positionAnimationController;
 
   @override
   initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    _imageSizeAnimationController = new AnimationController(
-        vsync: this, duration: new Duration(milliseconds: 150));
+    _imageSizeAnimationController =
+        new AnimationController(vsync: this, duration: ANIMATION_DURATION);
     _imageSizeAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         holdTimer = Timer(TIMEOUT, () {
-          _imageSizeAnimationController.reverse();
+//          _imageSizeAnimationController.reverse();
+          _positionAnimationController.forward();
         });
       }
+    });
+    _positionAnimationController =
+        AnimationController(vsync: this, duration: ANIMATION_DURATION);
+    _positionAnimationController.addListener(() {
+      setState(() {});
     });
     _imageSizeAnimationController.addListener(() {
       setState(() {});
@@ -77,22 +85,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildIcons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
+      alignment: FractionalOffset.center,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: GestureDetector(
-            onTap: () => _onChoice(FIRST_CHOICE),
-            child: _buildContainer(FIRST_CHOICE),
-          ),
+        GestureDetector(
+          onTap: () => _onChoice(FIRST_CHOICE),
+          child: _buildContainer(FIRST_CHOICE),
         ),
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: GestureDetector(
-            onTap: () => _onChoice(SECOND_CHOICE),
-            child: _buildContainer(SECOND_CHOICE),
-          ),
+        GestureDetector(
+          onTap: () => _onChoice(SECOND_CHOICE),
+          child: _buildContainer(SECOND_CHOICE),
         )
       ],
     );
@@ -114,8 +116,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     final double animationValue = _imageSizeAnimationController.value / 3.0;
     final double factor =
         index == _animationIndex ? 1 + animationValue : 1 - animationValue;
-    return new Container(
-        alignment: new FractionalOffset(0.5, 0.5),
+    return new Positioned(
         width: size,
         height: size,
         child: Transform(
@@ -147,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         color: Colors.blueGrey),
                   ),
                 ),
-                _buildIcons(),
+//                _buildIcons(),
               ],
             ),
             Padding(
