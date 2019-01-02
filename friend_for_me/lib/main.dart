@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'animation.dart';
 
 const IMAGE_ASSET_PATH = 'graphics';
 
@@ -42,7 +43,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
+    _controller = AnimationController(
+        duration: Duration(milliseconds: 1000), vsync: this);
     _imageSizeAnimationController = new AnimationController(
         vsync: this, duration: new Duration(milliseconds: 150));
     _imageSizeAnimationController.addStatusListener((status) {
@@ -61,6 +63,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void dispose() {
     _controller.stop();
     super.dispose();
+  }
+
+  Future<void> _playAnimation() async {
+    try {
+      await _controller.forward().orCancel;
+//      await _controller.reverse().orCancel;
+    } on TickerCanceled {
+      // the animation got canceled, probably because we were disposed
+    }
   }
 
   void _incrementCounter() {
@@ -83,17 +94,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
-            onTap: () => _onChoice(FIRST_CHOICE),
-            child: _buildContainer(FIRST_CHOICE),
+            onTap: () => _playAnimation(),
+            child: StaggerAnimation(
+              controller: _controller.view,
+            ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: GestureDetector(
-            onTap: () => _onChoice(SECOND_CHOICE),
-            child: _buildContainer(SECOND_CHOICE),
-          ),
-        )
+//        Padding(
+//          padding: const EdgeInsets.all(12.0),
+//          child: GestureDetector(
+//            onTap: () => _playAnimation(),
+//            child: _buildContainer(SECOND_CHOICE),
+//          ),
+//        )
       ],
     );
   }
