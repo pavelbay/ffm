@@ -65,26 +65,28 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildIcons() {
+    int firstIndex = 0;
+    int secondIndex = 1;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
-            onTap: () => _playAnimation(0),
+            onTap: () => _playAnimation(firstIndex),
             child: StaggerAnimation(
               controller: _firstImageController.view,
-              index: 0,
+              index: firstIndex,
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
-            onTap: () => _playAnimation(1),
+            onTap: () => _playAnimation(secondIndex),
             child: StaggerAnimation(
               controller: _secondImageController.view,
-              index: 1,
+              index: secondIndex,
             ),
           ),
         ),
