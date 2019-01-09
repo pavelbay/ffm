@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 const IMAGE_ASSET_PATH = 'graphics';
 
 class StaggerAnimation extends StatelessWidget {
-  StaggerAnimation({Key key, this.controller})
+  StaggerAnimation({Key key, this.controller, this.index})
       :
 
         // Each animation defined here transforms its value during the subset
@@ -17,7 +17,8 @@ class StaggerAnimation extends StatelessWidget {
           CurvedAnimation(
             parent: controller,
             curve: Interval(
-              0.7, 1.0,
+              0.7,
+              1.0,
               curve: Curves.ease,
             ),
           ),
@@ -97,13 +98,15 @@ class StaggerAnimation extends StatelessWidget {
   final Animation<BorderRadius> borderRadius;
   final Animation<Color> color;
 
+  final int index;
+
   Widget _buildImage() {
-//    String assetName;
-//    if (index == FIRST_CHOICE) {
-      String assetName = 'clouds.webp';
-//    } else if (index == SECOND_CHOICE) {
-//      assetName = 'sun.webp';
-//    }
+    String assetName;
+    if (index == FIRST_CHOICE) {
+      assetName = 'clouds.webp';
+    } else if (index == SECOND_CHOICE) {
+      assetName = 'sun.webp';
+    }
     final String imagePath = '$IMAGE_ASSET_PATH/$assetName';
     return Image.asset(imagePath);
   }
@@ -139,14 +142,14 @@ class StaggerAnimation extends StatelessWidget {
       opacity: opacity.value,
       child: Container(
           alignment: new FractionalOffset(0.5, 0.5),
-//        padding: EdgeInsets.only(bottom: 10 + padding.value),
           width: size,
           height: size,
           child: Transform(
             alignment: FractionalOffset.center,
             transform: Matrix4.identity()
               ..scale(1.0 + 0.5 * scale.value, 1.0 + 0.5 * scale.value)
-              ..setTranslationRaw(0.0 - xTranslation.value, 0.0 + yTranslation.value, 0.0),
+              ..setTranslationRaw(
+                  0.0 - xTranslation.value, 0.0 + yTranslation.value, 0.0),
             child: _buildImage(),
           )),
     );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'animation.dart';
 
 const IMAGE_ASSET_PATH = 'graphics';
@@ -35,55 +36,31 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   Timer holdTimer;
 
-  int _animationIndex;
-  int _counter = 0;
-
-  AnimationController _controller, _imageSizeAnimationController;
+  AnimationController _firstImageController, _secondImageController;
 
   @override
   initState() {
     super.initState();
-    _controller = AnimationController(
+    _firstImageController = AnimationController(
         duration: Duration(milliseconds: 1000), vsync: this);
-    _imageSizeAnimationController = new AnimationController(
-        vsync: this, duration: new Duration(milliseconds: 150));
-    _imageSizeAnimationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        holdTimer = Timer(TIMEOUT, () {
-          _imageSizeAnimationController.reverse();
-        });
-      }
-    });
-    _imageSizeAnimationController.addListener(() {
-      setState(() {});
-    });
+    _secondImageController = new AnimationController(
+        vsync: this, duration: new Duration(milliseconds: 1000));
   }
 
   @override
   void dispose() {
-    _controller.stop();
+    _firstImageController.stop();
+    _secondImageController.stop();
     super.dispose();
   }
 
-  Future<void> _playAnimation() async {
+  Future<void> _playAnimation(int index) async {
     try {
-      await _controller.forward().orCancel;
-//      await _controller.reverse().orCancel;
+      index == 0
+          ? await _firstImageController.forward().orCancel
+          : await _secondImageController.forward().orCancel;
     } on TickerCanceled {
       // the animation got canceled, probably because we were disposed
-    }
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _onChoice(int choice) {
-    if (holdTimer == null || !holdTimer.isActive) {
-      _animationIndex = choice;
-      _imageSizeAnimationController.forward(from: 0.0);
     }
   }
 
@@ -94,48 +71,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: GestureDetector(
-            onTap: () => _playAnimation(),
+            onTap: () => _playAnimation(0),
             child: StaggerAnimation(
-              controller: _controller.view,
+              controller: _firstImageController.view,
+              index: 0,
             ),
           ),
         ),
-//        Padding(
-//          padding: const EdgeInsets.all(12.0),
-//          child: GestureDetector(
-//            onTap: () => _playAnimation(),
-//            child: _buildContainer(SECOND_CHOICE),
-//          ),
-//        )
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: GestureDetector(
+            onTap: () => _playAnimation(1),
+            child: StaggerAnimation(
+              controller: _secondImageController.view,
+              index: 1,
+            ),
+          ),
+        ),
       ],
     );
-  }
-
-  Widget _buildImage(int index) {
-    String assetName;
-    if (index == FIRST_CHOICE) {
-      assetName = 'clouds.webp';
-    } else if (index == SECOND_CHOICE) {
-      assetName = 'sun.webp';
-    }
-    final String imagePath = '$IMAGE_ASSET_PATH/$assetName';
-    return Image.asset(imagePath);
-  }
-
-  Widget _buildContainer(int index) {
-    final double size = 100.0;
-    final double animationValue = _imageSizeAnimationController.value / 3.0;
-    final double factor =
-        index == _animationIndex ? 1 + animationValue : 1 - animationValue;
-    return new Container(
-        alignment: new FractionalOffset(0.5, 0.5),
-        width: size,
-        height: size,
-        child: Transform(
-          alignment: FractionalOffset.center,
-          transform: Matrix4.identity()..scale(1.0 * factor, 1.0 * factor),
-          child: _buildImage(index),
-        ));
   }
 
   @override
@@ -175,8 +129,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 child: LinearProgressIndicator(
                   value: 0.0,
                   backgroundColor: Colors.amberAccent,
-                  valueColor:
-                      ColorTween(begin: Colors.green).animate(_controller),
+                  valueColor: ColorTween(begin: Colors.green)
+                      .animate(_firstImageController),
                 ),
               ),
             )
