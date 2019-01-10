@@ -32,7 +32,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static const int FIRST_CHOICE = 0;
   static const int SECOND_CHOICE = 1;
-  static const TIMEOUT = const Duration(seconds: 1);
+  static const ANIM_DURATION = const Duration(seconds: 1);
 
   Timer holdTimer;
 
@@ -42,11 +42,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   initState() {
     super.initState();
     _firstImageController =
-        AnimationController(duration: Duration(milliseconds: 1000), vsync: this)
+        AnimationController(duration: ANIM_DURATION, vsync: this)
           ..addStatusListener(animationListener);
-    _secondImageController = new AnimationController(
-        vsync: this, duration: new Duration(milliseconds: 1000))
-      ..addStatusListener(animationListener);
+    _secondImageController =
+        new AnimationController(vsync: this, duration: ANIM_DURATION)
+          ..addStatusListener(animationListener);
   }
 
   void animationListener(AnimationStatus status) {
