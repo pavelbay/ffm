@@ -111,31 +111,6 @@ class StaggerAnimation extends StatelessWidget {
     return Image.asset(imagePath);
   }
 
-  // This function is called each time the controller "ticks" a new frame.
-  // When it runs, all of the animation's values will have been
-  // updated to reflect the controller's current value.
-//  Widget _buildAnimation(BuildContext context, Widget child) {
-//    return Container(
-//      padding: padding.value,
-//      alignment: Alignment.bottomCenter,
-//      child: Opacity(
-//        opacity: opacity.value,
-//        child: Container(
-//          width: width.value,
-//          height: height.value,
-//          decoration: BoxDecoration(
-//            color: color.value,
-//            border: Border.all(
-//              color: Colors.indigo[300],
-//              width: 3.0,
-//            ),
-//            borderRadius: borderRadius.value,
-//          ),
-//        ),
-//      ),
-//    );
-//  }
-
   Widget _buildAnimation(BuildContext context, Widget child) {
     final double size = 100.0;
     return Opacity(

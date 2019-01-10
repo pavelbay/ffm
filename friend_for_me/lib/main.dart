@@ -41,10 +41,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   initState() {
     super.initState();
-    _firstImageController = AnimationController(
-        duration: Duration(milliseconds: 1000), vsync: this);
+    _firstImageController =
+        AnimationController(duration: Duration(milliseconds: 1000), vsync: this)
+          ..addStatusListener(animationListener);
     _secondImageController = new AnimationController(
-        vsync: this, duration: new Duration(milliseconds: 1000));
+        vsync: this, duration: new Duration(milliseconds: 1000))
+      ..addStatusListener(animationListener);
+  }
+
+  void animationListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      setState(() {
+        _firstImageController.reset();
+        _secondImageController.reset();
+      });
+    }
   }
 
   @override
