@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import 'animation.dart';
 
@@ -33,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static const int FIRST_CHOICE = 0;
   static const int SECOND_CHOICE = 1;
   static const ANIM_DURATION = const Duration(seconds: 1);
-
+  int _progress = 0;
   Timer holdTimer;
 
   AnimationController _firstImageController, _secondImageController;
@@ -66,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _playAnimation(int index) async {
+    _progress++;
     try {
       index == 0
           ? await _firstImageController.forward().orCancel
@@ -111,11 +113,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 //      appBar: new AppBar(
 //        title: new Text(widget.title),
 //      ),
-      body: new Center(
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Column(
+      body: new Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 100.0),
+            child: Column(
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(32.0),
@@ -130,25 +133,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 _buildIcons(),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 30.0,
-                decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(30.0),
-                        topRight: const Radius.circular(10.0))),
-                child: LinearProgressIndicator(
-                  value: 0.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                LinearPercentIndicator(
+                  lineHeight: 20,
+                  width: 350,
+                  animateFromLastPercent: true,
+                  animation: true,
                   backgroundColor: Colors.amberAccent,
-                  valueColor: ColorTween(begin: Colors.green)
-                      .animate(_firstImageController),
+                  percent: _progress * 10 / 100,
                 ),
-              ),
-            )
-          ],
-        ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
