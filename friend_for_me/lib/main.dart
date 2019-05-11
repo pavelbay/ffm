@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:friend_for_me/events.dart';
+import 'package:friend_for_me/main_bloc.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import 'animation.dart';
@@ -35,7 +37,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   static const int SECOND_CHOICE = 1;
   static const ANIM_DURATION = const Duration(seconds: 1);
   int _progress = 0;
-  Timer holdTimer;
+
+  final _bloc = MainBloc();
 
   AnimationController _firstImageController, _secondImageController;
 
@@ -43,11 +46,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   initState() {
     super.initState();
     _firstImageController =
-        AnimationController(duration: ANIM_DURATION, vsync: this)
-          ..addStatusListener(animationListener);
+    AnimationController(duration: ANIM_DURATION, vsync: this)
+      ..addStatusListener(animationListener);
     _secondImageController =
-        new AnimationController(vsync: this, duration: ANIM_DURATION)
-          ..addStatusListener(animationListener);
+    new AnimationController(vsync: this, duration: ANIM_DURATION)
+      ..addStatusListener(animationListener);
   }
 
   void animationListener(AnimationStatus status) {
@@ -63,15 +66,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void dispose() {
     _firstImageController.stop();
     _secondImageController.stop();
+    _bloc.dispose();
     super.dispose();
   }
 
   Future<void> _playAnimation(int index) async {
-    _progress++;
+    _bloc.progressEventSink.add(ProgressEvent());
     try {
       index == 0
-          ? await _firstImageController.forward().orCancel
-          : await _secondImageController.forward().orCancel;
+          ? await _firstImageController
+          .forward()
+          .orCancel
+          : await _secondImageController
+          .forward()
+          .orCancel;
     } on TickerCanceled {
       // the animation got canceled, probably because we were disposed
     }
@@ -134,22 +142,36 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                LinearPercentIndicator(
-                  lineHeight: 20,
-                  width: 350,
-                  animateFromLastPercent: true,
-                  animation: true,
-                  backgroundColor: Colors.amberAccent,
-                  percent: _progress * 10 / 100,
-                ),
-              ],
-            ),
-          )
+          _buildStreamProgress()
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStreamProgress() {
+    return StreamBuilder(
+      stream: _bloc.progress,
+      initialData: 0,
+      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+        return _buildProgress(snapshot);
+      },
+    );
+  }
+
+  Widget _buildProgress(AsyncSnapshot<int> snapshot) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          LinearPercentIndicator(
+            lineHeight: 20,
+            width: 350,
+            animateFromLastPercent: true,
+            animation: true,
+            backgroundColor: Colors.amberAccent,
+            percent: snapshot.data * 10 / 100,
+          ),
         ],
       ),
     );
